@@ -1,0 +1,17 @@
+CREATE TABLE Ages ( 
+  name VARCHAR(128), 
+  age INTEGER
+);
+
+DELETE FROM Ages;
+INSERT INTO Ages (name, age) VALUES ('Ashwin', 33);
+INSERT INTO Ages (name, age) VALUES ('Stefany', 16);
+INSERT INTO Ages (name, age) VALUES ('Sonneey', 34);
+INSERT INTO Ages (name, age) VALUES ('Olurotimi', 23);
+
+SELECT sha1(CONCAT(name,age)) AS X FROM Ages ORDER BY X;
+->
+3733726514653c8e52eb6c7f3fdeeb6c8c0a01d0
+3f779f48dc92a74411de8b9320e6df5147d189f1
+e0d6a1b47973db02fd0b8cf769dcb592f4b355b8
+f60c1b23ff93bf2d23bd153264fbe38343aedf19
