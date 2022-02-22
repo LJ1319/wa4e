@@ -19,7 +19,7 @@
 
 		if ( strlen($_POST['first_name']) < 1 || strlen($_POST['last_name']) < 1 || strlen($_POST['email']) < 1 || strlen($_POST['headline']) < 1 || strlen($_POST['summary']) < 1 ) {
 			$_SESSION['error'] = "All fields are required";
-			header("Location: add.php");
+			header("Location: forms.php");
 			return;
 		} 
 
@@ -27,7 +27,7 @@
 		$msg = validatePos();
 		if ( is_string($msg) ) {
 			$_SESSION['error'] = $msg;
-			header("Location: add.php");
+			header("Location: forms.php");
 			return;
 		}
 
@@ -44,26 +44,15 @@
 			':su' => $_POST['summary']
 		));
 		$profile_id = $pdo->lastInsertId();
+		insertPositions($pdo, $profile_id);
 
-
-		$rank = 1;
-		for ($i = 1; $i <= 9 ; $i++) { 
-			if ( !isset($_POST['year'.$i]) ) continue;
-			if ( !isset($_POST['descr'.$i]) ) continue;
-
-			$year = $_POST['year'.$i];
-			$descr = $_POST['descr'.$i];
-
-			$stmt = $pdo->prepare("INSERT INTO position (profile_id, rank, year, description) VALUES (:pid, :rank, :year, :descr)");
-			$stmt->execute(array(
-				':pid' => $profile_id,
-				':rank' => $rank,
-				':year' => $year,
-				':descr' => $descr
-			));
-			$rank++;
-
+		$msg = validateEdu();
+		if ( is_string($msg)) {
+		    $_SESSION['error'] = $msg;
+		    header("Location: forms.php");
+		    return;
 		}
+		insertEducations($pdo, $profile_id);
 
 
 		$_SESSION['success'] = "added";	
@@ -114,6 +103,11 @@
 				<div id="position_fields"></div>
 			</p>
 
+			<p>
+				Education: <input type="submit" id="addEdu" value="+">
+				<div id="edu_fields"></div>
+			</p>
+
 			<input type="submit" value="Add" name="add">
 			<input type="submit" name="cancel" value="Cancel">
 		</form>
@@ -121,6 +115,7 @@
 
 		<script type="text/javascript">
 			countPos = 0;
+			countEdu = 0;
 
 			$(document).ready(function(){
 				window.console && console.log('Document ready called');
@@ -140,9 +135,42 @@
 				            <textarea name="descr'+countPos+'" rows="8" cols="80"></textarea>\
 			            </div>');
 				});
+
+				$('#addEdu').click(function(event){
+					event.preventDefault();
+					if ( countEdu >= 9 ) {
+					  arert("Maximum of nine education entries exceeded");
+					  return;
+					}
+					countEdu++;
+					window.console && console.log("Adding education"+countEdu);
+
+					var source = $("#edu-template").html();
+					$('#edu_fields').append(source.replace(/@COUNT@/g,countEdu));
+
+					$('.school').autocomplete({
+					  source: "school.php"
+						});
+					});
+					$('.school').autocomplete({
+						source: "school.php"
+					});
 			});
 
 		</script>
+
+
+		<script id="edu-template" type="text">
+		  <div id="edu@COUNT@">
+		      <p>
+		          Year: <input type="text" name="edu_year@COUNT@" value="" />
+		          <input type="button" value="-" onclick="$('#edu@COUNT@').remove(); return false;"><br>
+		      </p>
+		      <p>
+		          School: <input type="text" size="80" name="edu_school@COUNT@" class="school" value="" /> 
+		      </p>
+		  </div>
+		</script>  
 
 	</div>
 </body>

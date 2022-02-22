@@ -24,6 +24,8 @@
 	}
 
 	$positions = loadPos($pdo, $_REQUEST['profile_id']);
+	$schools = loadEdu($pdo, $_REQUEST['profile_id']);
+
 
  ?>
 
@@ -58,10 +60,15 @@
 			<?php foreach( $positions as $position) { ?>
 				<li><?= htmlentities($position['year'].": ".$position['description']); ?></li>
 			<?php	} ?>	
-			
 		</ul>
 
-		
+		<p>Education</p>
+		<ul>
+			<?php foreach( $schools as $school) { ?>
+				<li><?= htmlentities($school['year'].": ".$school['name']); ?></li>
+			<?php	} ?>	
+			
+		</ul>
 
 
 		<a href="index.php">Done</a>
